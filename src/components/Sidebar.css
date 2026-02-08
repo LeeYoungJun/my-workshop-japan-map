@@ -222,7 +222,7 @@
   padding: 12px 14px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sidebar__list::-webkit-scrollbar {
@@ -245,203 +245,392 @@
 /* ===== Day Card ===== */
 .day-card {
   display: flex;
-  min-height: 120px;
+  flex-direction: column;
   border-radius: 12px;
   background: #ffffff;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   border: 1px solid #e8ecf1;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   flex-shrink: 0;
+  padding: 14px 16px;
+  gap: 10px;
 }
 
 .day-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
   border-color: #d0d7e0;
 }
 
 .day-card--selected {
   border-color: #2563eb;
   box-shadow:
-    0 0 0 2px rgba(37, 99, 235, 0.15),
-    0 4px 16px rgba(37, 99, 235, 0.1);
+    0 0 0 2px rgba(37, 99, 235, 0.12),
+    0 4px 16px rgba(37, 99, 235, 0.08);
+  background: #fafbff;
 }
 
-/* Thumbnail — left */
-.day-card__thumb {
-  position: relative;
-  width: 110px;
-  min-width: 110px;
-  background-size: cover;
-  background-position: center;
+/* Moving day left accent */
+.day-card--moving {
+  border-left: 3px solid #f59e0b;
 }
 
-.day-card__thumb-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.08) 0%,
-    rgba(0, 0, 0, 0.25) 100%
-  );
+.day-card--moving.day-card--selected {
+  border-left: 3px solid #2563eb;
 }
 
-.day-card__day-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  padding: 3px 8px;
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: #ffffff;
-  background: rgba(37, 99, 235, 0.9);
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
-}
-
-.day-card--selected .day-card__day-badge {
-  background: #2563eb;
-}
-
-/* Body — right */
-.day-card__body {
-  flex: 1;
-  padding: 12px 14px;
+/* ── Card Header ── */
+.day-card__header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  gap: 8px;
-}
-
-.day-card__top {
-  display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.day-card__title {
-  margin: 0;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #1e293b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
+.day-card__day-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.day-card--selected .day-card__title {
-  color: #1d4ed8;
+.day-card__day-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #ffffff;
+  background: #2563eb;
+  border-radius: 5px;
+  line-height: 1.5;
+}
+
+.day-card--selected .day-card__day-badge {
+  background: #1d4ed8;
 }
 
 .day-card__date {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #94a3b8;
-  white-space: nowrap;
-  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: -0.2px;
 }
 
 .day-card__date--weekend {
   color: #ef4444;
 }
 
-/* Meta row: city | transport */
-.day-card__meta {
+.day-card__platform {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border-radius: 5px;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+/* ── Route Section ── */
+.day-card__route {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
-  font-size: 0.78rem;
-  color: #64748b;
-  line-height: 1;
-}
-
-.day-card__city {
-  font-weight: 600;
-}
-
-.day-card__divider {
-  color: #d1d5db;
-  font-weight: 300;
-}
-
-.day-card__transport {
-  font-weight: 500;
-}
-
-/* Activities */
-.day-card__activities {
-  margin: 0;
-  font-size: 0.76rem;
-  font-weight: 500;
-  color: #94a3b8;
-  line-height: 1.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-/* Action buttons */
-.day-card__actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 2px;
-}
-
-.day-card__action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
+  padding: 8px 10px;
   background: #f8fafc;
-  color: #64748b;
+  border-radius: 8px;
+  border: 1px solid #f0f2f5;
+}
+
+.day-card--selected .day-card__route {
+  background: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.day-card__route-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.day-card__route-transport {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.7rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 1;
+  color: #64748b;
 }
 
-.day-card__action-btn:hover {
-  border-color: #c7d2fe;
-  background: #f0f4ff;
-}
-
-.day-card__action-btn--hotel:hover,
-.day-card__action-btn--hotel.day-card__action-btn--active {
-  background: #ede9fe;
-  border-color: #a78bfa;
-  color: #7c3aed;
-}
-
-.day-card__action-btn--restaurant:hover,
-.day-card__action-btn--restaurant.day-card__action-btn--active {
-  background: #fff7ed;
-  border-color: #fdba74;
-  color: #ea580c;
-}
-
-.day-card__action-btn--active {
+/* Route view button per card */
+.day-card__route-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  font-size: 0.62rem;
   font-weight: 700;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  color: #3b82f6;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.day-card__action-btn svg {
+.day-card__route-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.day-card__route-btn--active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.day-card__route-btn--active:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.day-card__route-btn svg {
   flex-shrink: 0;
 }
 
-.day-card--selected .day-card__meta {
+.day-card__route-transport svg {
+  flex-shrink: 0;
+  color: #94a3b8;
+}
+
+.day-card--selected .day-card__route-transport {
   color: #3b82f6;
 }
 
-.day-card--selected .day-card__activities {
+.day-card--selected .day-card__route-transport svg {
   color: #60a5fa;
+}
+
+.day-card__route-cities {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.day-card__route-from {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.day-card__route-arrow {
+  flex-shrink: 0;
+  color: #f59e0b;
+}
+
+.day-card__route-to {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.2px;
+}
+
+.day-card--selected .day-card__route-to {
+  color: #1d4ed8;
+}
+
+.day-card__route-country {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #94a3b8;
+  padding: 1px 6px;
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.day-card--selected .day-card__route-country {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+/* ── Activities ── */
+.day-card__activities {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.day-card__activities svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #94a3b8;
+}
+
+.day-card--selected .day-card__activities svg {
+  color: #60a5fa;
+}
+
+.day-card__activities p {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.day-card--selected .day-card__activities p {
+  color: #475569;
+  -webkit-line-clamp: unset;
+}
+
+/* ── Accommodation ── */
+.day-card__accom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #faf9ff;
+  border: 1px solid #f0eef5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-card__accom:hover {
+  background: #f3f0ff;
+  border-color: #e5e0f0;
+}
+
+.day-card__accom--expanded {
+  background: #f3f0ff;
+  border-color: #d8d0ee;
+}
+
+.day-card__accom--pending {
+  cursor: default;
+  background: #fafafa;
+  border-color: #f0f0f0;
+}
+
+.day-card__accom--pending:hover {
+  background: #fafafa;
+  border-color: #f0f0f0;
+}
+
+.day-card__accom-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.day-card__accom-header svg:first-child {
+  flex-shrink: 0;
+  color: #7c3aed;
+}
+
+.day-card__accom-name {
+  flex: 1;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #4c1d95;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.day-card__accom-name--pending {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.day-card__accom--pending svg {
+  color: #cbd5e1;
+}
+
+.day-card__accom-chevron {
+  flex-shrink: 0;
+  color: #a78bfa;
+  transition: transform 0.2s ease;
+}
+
+.day-card__accom-chevron--open {
+  transform: rotate(180deg);
+}
+
+.day-card__accom-address {
+  margin: 0;
+  padding: 4px 0 2px 19px;
+  font-size: 0.7rem;
+  color: #6b7280;
+  line-height: 1.5;
+  animation: accomSlideDown 0.15s ease-out;
+}
+
+@keyframes accomSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Accommodation active state (map pin shown) ── */
+.day-card__accom--active {
+  background: #f3e8ff;
+  border-color: #c084fc;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+.day-card__accom--active .day-card__accom-name {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.day-card__accom--active svg:first-child {
+  color: #7c3aed;
+}
+
+/* ── Accommodation expanded details ── */
+.day-card__accom-details {
+  padding: 4px 0 2px 19px;
+  animation: accomSlideDown 0.15s ease-out;
+}
+
+.day-card__accom-detail-name {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #4c1d95;
+  line-height: 1.5;
+}
+
+/* ── Selected state overrides ── */
+.day-card--selected .day-card__accom {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.day-card--selected .day-card__accom:hover {
+  background: #e0e7ff;
+}
+
+.day-card--selected .day-card__accom-name {
+  color: #3730a3;
+}
+
+.day-card--selected .day-card__accom--active {
+  background: #ede9fe;
+  border-color: #a78bfa;
 }
