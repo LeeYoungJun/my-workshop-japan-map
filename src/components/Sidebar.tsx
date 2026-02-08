@@ -196,14 +196,17 @@ export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, show
       <button
         className={`sidebar-toggle ${collapsed ? 'sidebar-toggle--collapsed' : ''}`}
         onClick={onToggleCollapse}
-        aria-label={collapsed ? '사이드바 열기' : '사이드바 닫기'}
+        aria-label={collapsed ? '일정 보기' : '지도 보기'}
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          {collapsed
-            ? <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>
-            : <><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></>
-          }
-        </svg>
+        {collapsed ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        )}
       </button>
 
       <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>

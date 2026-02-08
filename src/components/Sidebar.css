@@ -840,3 +840,182 @@
 .day-card--selected .day-card__golf:hover {
   background: #dcfce7;
 }
+
+/* ===== Responsive: Mobile (iPhone) ===== */
+@media (max-width: 640px) {
+  /* Sidebar becomes bottom sheet */
+  .sidebar {
+    width: 100%;
+    height: 65vh;
+    height: 65dvh;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar--collapsed {
+    transform: translateY(100%);
+  }
+
+  /* Toggle button: top-left on map */
+  .sidebar-toggle {
+    top: env(safe-area-inset-top, 12px);
+    left: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .sidebar-toggle--collapsed {
+    left: 12px;
+  }
+
+  .sidebar-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Bottom sheet drag handle */
+  .sidebar__header::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: #cbd5e1;
+    border-radius: 2px;
+    margin: 8px auto 4px;
+  }
+
+  /* Compact banner */
+  .sidebar__header-banner {
+    height: 80px;
+  }
+
+  .sidebar__header-banner-content {
+    padding: 0 16px;
+  }
+
+  .sidebar__badge {
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+  }
+
+  .sidebar__title {
+    font-size: 1.05rem;
+  }
+
+  .sidebar__subtitle {
+    font-size: 0.72rem;
+    margin-top: 2px;
+  }
+
+  /* Stats */
+  .sidebar__stats {
+    padding: 10px 16px;
+  }
+
+  .sidebar__stat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+
+  .sidebar__stat-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .sidebar__stat-value {
+    font-size: 0.76rem;
+  }
+
+  .sidebar__stat-label {
+    font-size: 0.64rem;
+  }
+
+  .sidebar__stat-divider {
+    margin: 0 8px;
+    height: 24px;
+  }
+
+  /* Route button */
+  .sidebar__route-btn {
+    width: calc(100% - 32px);
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+
+  /* Golf route info */
+  .sidebar__golf-route {
+    margin: 0 16px;
+    padding: 10px 12px;
+  }
+
+  .sidebar__golf-route-from,
+  .sidebar__golf-route-to {
+    font-size: 0.74rem;
+  }
+
+  /* Day cards list */
+  .sidebar__list {
+    padding: 10px 12px 32px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+  }
+
+  /* Card touch targets */
+  .day-card {
+    padding: 14px 14px;
+  }
+
+  .day-card__golf-item {
+    padding: 8px 10px;
+    min-height: 40px;
+  }
+
+  .day-card__golf-header {
+    min-height: 36px;
+    padding: 4px 0;
+  }
+}
+
+/* ===== Responsive: Tablet (iPad) ===== */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .sidebar {
+    width: 320px;
+  }
+
+  .sidebar-toggle {
+    left: 320px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar-toggle--collapsed {
+    left: 0;
+  }
+
+  .sidebar__header-banner {
+    height: 96px;
+  }
+
+  .sidebar__title {
+    font-size: 1.15rem;
+  }
+}
+
+/* ===== iOS safe area ===== */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 640px) {
+    .sidebar__list {
+      padding-bottom: calc(32px + env(safe-area-inset-bottom));
+    }
+  }
+}
