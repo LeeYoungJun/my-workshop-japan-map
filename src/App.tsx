@@ -11,8 +11,8 @@ const mapContainerStyle = {
   height: '100vh',
 }
 
-const defaultCenter = { lat: 48.5, lng: 15.0 }
-const defaultZoom = 6
+const defaultCenter = { lat: 34.6304, lng: 135.2238 }  // Kobe Airport
+const defaultZoom = 12
 
 const routeLineOptions: google.maps.PolylineOptions = {
   strokeColor: '#2563eb',
@@ -55,6 +55,7 @@ function App() {
   const [activeAccomDay, setActiveAccomDay] = useState<number | null>(null)
   const [dayRouteDay, setDayRouteDay] = useState<number | null>(null)
   const [dayRouteResult, setDayRouteResult] = useState<google.maps.DirectionsResult | null>(null)
+  const [activeGolfCourse, setActiveGolfCourse] = useState<{ name: string; lat: number; lng: number } | null>(null)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const animating = useRef(false)
 
@@ -212,6 +213,25 @@ function App() {
     )
   }, [map, dayRouteDay])
 
+  const handleShowGolfCourse = useCallback((lat: number, lng: number, name: string) => {
+    if (activeGolfCourse?.name === name) {
+      setActiveGolfCourse(null)
+      return
+    }
+
+    setActiveGolfCourse({ name, lat, lng })
+
+    if (map && !animating.current) {
+      animating.current = true
+      map.panTo({ lat, lng })
+      setTimeout(() => {
+        smoothZoom(map, 14, () => {
+          animating.current = false
+        })
+      }, 300)
+    }
+  }, [map, activeGolfCourse])
+
   const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
     mapInstance.setOptions({
       mapTypeControlOptions: {
@@ -263,6 +283,8 @@ function App() {
           onShowAccom={handleShowAccom}
           dayRouteDay={dayRouteDay}
           onShowDayRoute={handleShowDayRoute}
+          activeGolfCourse={activeGolfCourse?.name ?? null}
+          onShowGolfCourse={handleShowGolfCourse}
         />
         <div className="map-container">
           <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
@@ -355,6 +377,23 @@ function App() {
                     )
                   })()}
                 </>
+              )}
+
+              {/* Golf course marker */}
+              {activeGolfCourse && (
+                <OverlayViewF
+                  position={{ lat: activeGolfCourse.lat, lng: activeGolfCourse.lng }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div className="poi-marker poi-marker--golf">
+                    <div className="poi-marker__icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                        <circle cx="19.5" cy="3.5" r="2.5"/><path d="M5 21V4l14 7-14 7"/>
+                      </svg>
+                    </div>
+                    <span className="poi-marker__label">{activeGolfCourse.name}</span>
+                  </div>
+                </OverlayViewF>
               )}
 
               {/* Accommodation marker */}

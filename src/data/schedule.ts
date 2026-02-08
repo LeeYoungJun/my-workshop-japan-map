@@ -7,6 +7,12 @@ export interface Accommodation {
   lng?: number
 }
 
+export interface GolfCourse {
+  name: string
+  lat: number
+  lng: number
+}
+
 export interface ScheduleEntry {
   day: number
   date: string
@@ -17,6 +23,7 @@ export interface ScheduleEntry {
   transport: string
   bookingPlatform: string | null
   accommodation: Accommodation | null
+  golfCourses: string[]
   activities: string
 }
 
@@ -25,6 +32,7 @@ export interface DaySchedule extends ScheduleEntry {
   lng: number
   zoom: number
   image: string
+  golfCourseData: GolfCourse[]
 }
 
 // City coordinates for the map
@@ -36,6 +44,14 @@ export const cityCoords: Record<string, { lat: number; lng: number; zoom: number
 // Accommodation coordinates (confirmed bookings only)
 const accomCoords: Record<string, { lat: number; lng: number }> = {
   '고베 오리엔탈 호텔': { lat: 34.6873, lng: 135.1930 },
+}
+
+// Golf course coordinates
+const golfCourseCoords: Record<string, { lat: number; lng: number }> = {
+  '도죠 파인 밸리': { lat: 34.8995, lng: 135.0379 },
+  '미키오카와': { lat: 34.8330, lng: 135.0375 },
+  '아리마컨츄리': { lat: 34.9046, lng: 135.1734 },
+  '웨스트윈즈': { lat: 34.9587, lng: 134.9981 },
 }
 
 // Unsplash city photos
@@ -55,7 +71,11 @@ export const schedule: DaySchedule[] = (rawSchedule as ScheduleEntry[]).map(entr
     accom.lat = accomCoords[accom.name].lat
     accom.lng = accomCoords[accom.name].lng
   }
-  return { ...entry, ...coords, image }
+  const golfCourseData: GolfCourse[] = (entry.golfCourses ?? []).map(name => ({
+    name,
+    ...(golfCourseCoords[name] ?? { lat: 0, lng: 0 }),
+  }))
+  return { ...entry, ...coords, image, golfCourseData }
 })
 
 // Unique cities for map markers

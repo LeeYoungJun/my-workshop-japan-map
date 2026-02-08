@@ -163,6 +163,18 @@
   font-weight: 500;
 }
 
+.sidebar__stat--clickable {
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  transition: background 0.15s;
+}
+
+.sidebar__stat--clickable:hover {
+  background: #f1f5f9;
+}
+
 .sidebar__stat-divider {
   width: 1px;
   height: 28px;
@@ -633,4 +645,109 @@
 .day-card--selected .day-card__accom--active {
   background: #ede9fe;
   border-color: #a78bfa;
+}
+
+/* ── Golf course section ── */
+.day-card__golf {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-card__golf:hover {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.day-card__golf--expanded {
+  background: #ecfdf5;
+  border-color: #86efac;
+}
+
+.day-card__golf-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.day-card__golf-header svg:first-child {
+  flex-shrink: 0;
+  color: #16a34a;
+}
+
+.day-card__golf-title {
+  flex: 1;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #15803d;
+  white-space: nowrap;
+}
+
+.day-card__golf-chevron {
+  flex-shrink: 0;
+  color: #4ade80;
+  transition: transform 0.2s ease;
+}
+
+.day-card__golf-chevron--open {
+  transform: rotate(180deg);
+}
+
+.day-card__golf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 2px 0;
+  animation: accomSlideDown 0.15s ease-out;
+}
+
+.day-card__golf-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-card__golf-item svg {
+  flex-shrink: 0;
+  color: #22c55e;
+}
+
+.day-card__golf-item span {
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: #166534;
+}
+
+.day-card__golf-item:hover {
+  background: #dcfce7;
+}
+
+.day-card__golf-item--active {
+  background: #bbf7d0;
+  box-shadow: 0 0 0 1.5px rgba(34, 197, 94, 0.3);
+}
+
+.day-card__golf-item--active span {
+  font-weight: 700;
+  color: #15803d;
+}
+
+/* ── Selected state overrides for golf ── */
+.day-card--selected .day-card__golf {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.day-card--selected .day-card__golf:hover {
+  background: #dcfce7;
 }

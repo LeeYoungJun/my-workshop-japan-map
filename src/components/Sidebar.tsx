@@ -14,6 +14,8 @@ interface SidebarProps {
   onShowAccom: (day: number) => void
   dayRouteDay: number | null
   onShowDayRoute: (day: number) => void
+  activeGolfCourse: string | null
+  onShowGolfCourse: (lat: number, lng: number, name: string) => void
 }
 
 /* ── Transport icon helper ── */
@@ -34,7 +36,7 @@ function getTransportIcon(transport: string) {
       <path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h20"/><path d="M5 18H3c-.6 0-1-.4-1-1V6c0-2.2 3.6-4 8-4s8 1.8 8 4v11c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>
     </svg>
   )
-  if (t.includes('렌터카')) return (
+  if (t.includes('렌터카') || t.includes('송영차량')) return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
       <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>
     </svg>
@@ -66,14 +68,14 @@ function getPlatformStyle(platform: string | null): { bg: string; color: string 
 }
 
 /* ── Day Card ── */
-function DayCard({ item, isSelected, onClick, isAccomActive, onShowAccom, isDayRouteActive, onShowDayRoute }: {
+function DayCard({ item, isSelected, onClick, isDayRouteActive, onShowDayRoute, activeGolfCourse, onShowGolfCourse }: {
   item: DaySchedule
   isSelected: boolean
   onClick: () => void
-  isAccomActive: boolean
-  onShowAccom: (day: number) => void
   isDayRouteActive: boolean
   onShowDayRoute: (day: number) => void
+  activeGolfCourse: string | null
+  onShowGolfCourse: (lat: number, lng: number, name: string) => void
 }) {
   const isWeekend = item.weekday === '토' || item.weekday === '일'
   const isMovingDay = item.departure !== item.city
@@ -87,7 +89,6 @@ function DayCard({ item, isSelected, onClick, isAccomActive, onShowAccom, isDayR
   }, [isSelected])
 
   const platformStyle = getPlatformStyle(item.bookingPlatform)
-  const hasAccomCoords = !!(item.accommodation && item.accommodation.lat && item.accommodation.lng)
 
   return (
     <div
@@ -159,43 +160,45 @@ function DayCard({ item, isSelected, onClick, isAccomActive, onShowAccom, isDayR
         </div>
       )}
 
-      {/* Accommodation: clickable "숙소" button for confirmed, expandable details */}
-      {item.accommodation && item.accommodation.name !== '미정' && (
-        <div
-          className={`day-card__accom ${expanded ? 'day-card__accom--expanded' : ''} ${isAccomActive ? 'day-card__accom--active' : ''}`}
-          onClick={(e) => {
-            e.stopPropagation()
-            if (hasAccomCoords) {
-              onShowAccom(item.day)
-            }
-            setExpanded(!expanded)
-          }}
-        >
-          <div className="day-card__accom-header">
+      {/* Golf courses */}
+      {item.golfCourseData && item.golfCourseData.length > 0 && (
+        <div className={`day-card__golf ${expanded ? 'day-card__golf--expanded' : ''}`}>
+          <div
+            className="day-card__golf-header"
+            onClick={(e) => {
+              e.stopPropagation()
+              setExpanded(!expanded)
+            }}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
-              <path d="M3 21V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14"/>
-              <path d="M3 11h18"/><path d="M9 21V11"/>
+              <circle cx="19.5" cy="3.5" r="2.5"/><path d="M5 21V4l14 7-14 7"/>
             </svg>
-            <span className="day-card__accom-name">숙소</span>
-            <svg className={`day-card__accom-chevron ${expanded ? 'day-card__accom-chevron--open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+            <span className="day-card__golf-title">골프장</span>
+            <svg className={`day-card__golf-chevron ${expanded ? 'day-card__golf-chevron--open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </div>
           {expanded && (
-            <div className="day-card__accom-details">
-              <p className="day-card__accom-detail-name">{item.accommodation.name}</p>
-              <p className="day-card__accom-address">{item.accommodation.address}</p>
+            <div className="day-card__golf-list">
+              {item.golfCourseData.map((gc) => (
+                <div
+                  key={gc.name}
+                  className={`day-card__golf-item ${activeGolfCourse === gc.name ? 'day-card__golf-item--active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (gc.lat && gc.lng) {
+                      onShowGolfCourse(gc.lat, gc.lng, gc.name)
+                    }
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  <span>{gc.name}</span>
+                </div>
+              ))}
             </div>
           )}
-        </div>
-      )}
-      {item.accommodation && item.accommodation.name === '미정' && (
-        <div className="day-card__accom day-card__accom--pending">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
-            <path d="M3 21V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14"/>
-            <path d="M3 11h18"/><path d="M9 21V11"/>
-          </svg>
-          <span className="day-card__accom-name day-card__accom-name--pending">숙소 미정</span>
         </div>
       )}
     </div>
@@ -203,9 +206,7 @@ function DayCard({ item, isSelected, onClick, isAccomActive, onShowAccom, isDayR
 }
 
 /* ── Sidebar ── */
-export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, activeAccomDay, onShowAccom, dayRouteDay, onShowDayRoute }: SidebarProps) {
-  const uniqueCities = new Set(schedule.map(s => s.city)).size
-
+export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, dayRouteDay, onShowDayRoute, activeGolfCourse, onShowGolfCourse }: SidebarProps) {
   return (
     <>
       <button
@@ -226,9 +227,9 @@ export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleC
           <div className="sidebar__header-banner">
             <div className="sidebar__header-banner-bg" />
             <div className="sidebar__header-banner-content">
-              <div className="sidebar__badge">2026 FAMILY TRIP</div>
-              <h2 className="sidebar__title">동유럽 가족 여행</h2>
-              <p className="sidebar__subtitle">체코 · 오스트리아</p>
+              <div className="sidebar__badge">2026 WORKSHOP</div>
+              <h2 className="sidebar__title">SPH 고베 워크샵</h2>
+              <p className="sidebar__subtitle">일본 · 고베</p>
             </div>
           </div>
           <div className="sidebar__stats">
@@ -237,18 +238,18 @@ export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleC
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
               </span>
               <div>
-                <span className="sidebar__stat-value">8.15 — 8.28</span>
-                <span className="sidebar__stat-label">14일간</span>
+                <span className="sidebar__stat-value">2.25 — 2.28</span>
+                <span className="sidebar__stat-label">4일간</span>
               </div>
             </div>
             <div className="sidebar__stat-divider" />
-            <div className="sidebar__stat">
+            <div className="sidebar__stat sidebar__stat--clickable" onClick={() => onShowAccom(1)}>
               <span className="sidebar__stat-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </span>
               <div>
-                <span className="sidebar__stat-value">{uniqueCities}개 도시</span>
-                <span className="sidebar__stat-label">2개국</span>
+                <span className="sidebar__stat-value">오리엔탈 호텔</span>
+                <span className="sidebar__stat-label">고베, 일본</span>
               </div>
             </div>
           </div>
@@ -270,10 +271,10 @@ export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleC
               item={item}
               isSelected={selectedDay === item.day}
               onClick={() => onSelectDay(selectedDay === item.day ? null : item.day)}
-              isAccomActive={activeAccomDay === item.day}
-              onShowAccom={onShowAccom}
               isDayRouteActive={dayRouteDay === item.day}
               onShowDayRoute={onShowDayRoute}
+              activeGolfCourse={activeGolfCourse}
+              onShowGolfCourse={onShowGolfCourse}
             />
           ))}
         </div>
