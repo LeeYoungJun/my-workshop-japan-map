@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView, DirectionsRenderer } from '@react-google-maps/api'
 import Sidebar from './components/Sidebar'
-import { schedule, routePath, getRouteMarkers, cityCoords, grossglocknerWaypoints } from './data/schedule'
+import { schedule, routePath, getRouteMarkers, cityCoords } from './data/schedule'
 import './App.css'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
@@ -162,13 +162,7 @@ function App() {
     setDayRouteDay(day)
     setDayRouteResult(null)
 
-    // Add Grossglockner waypoints for Day 9 (Innsbruck → Hallstatt)
-    const waypoints: google.maps.DirectionsWaypoint[] = day === 9
-      ? grossglocknerWaypoints.map(wp => ({
-          location: new google.maps.LatLng(wp.lat, wp.lng),
-          stopover: false,
-        }))
-      : []
+    const waypoints: google.maps.DirectionsWaypoint[] = []
 
     const directionsService = new google.maps.DirectionsService()
     directionsService.route(
@@ -239,12 +233,12 @@ function App() {
           <div className="splash-bg" />
           <div className="splash-content">
             <div className="splash-popup">
-              <div className="splash-badge">2026 FAMILY TRIP</div>
-              <h1>동유럽 가족 여행</h1>
-              <p className="splash-route">체코 · 오스트리아</p>
+              <div className="splash-badge">2026 WORKSHOP</div>
+              <h1>SPH 고베 워크샵</h1>
+              <p className="splash-route">일본 · 고베</p>
               <div className="splash-details">
                 <div className="splash-detail-item">
-                  <span className="splash-detail-value">13박 14일</span>
+                  <span className="splash-detail-value">3박 4일</span>
                 </div>
               </div>
               <div className="splash-divider" />

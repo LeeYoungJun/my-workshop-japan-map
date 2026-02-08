@@ -76,7 +76,7 @@
   inset: 0;
   background:
     linear-gradient(135deg, rgba(37, 99, 235, 0.92) 0%, rgba(124, 58, 237, 0.88) 100%),
-    url('https://images.unsplash.com/photo-1541849546-216549ae216d?w=800&q=60') center/cover no-repeat;
+    url('https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800&q=60') center/cover no-repeat;
 }
 
 .sidebar__header-banner-content {
