@@ -12,6 +12,9 @@ interface SidebarProps {
   onShowAccom: (day: number) => void
   activeGolfCourse: string | null
   onShowGolfCourse: (lat: number, lng: number, name: string) => void
+  golfRouteDuration: string | null
+  golfRouteLoading: boolean
+  golfRouteOriginLabel: string
 }
 
 /* ── Transport icon helper ── */
@@ -187,7 +190,7 @@ function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse
 }
 
 /* ── Sidebar ── */
-export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, activeGolfCourse, onShowGolfCourse }: SidebarProps) {
+export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, activeGolfCourse, onShowGolfCourse, golfRouteDuration, golfRouteLoading, golfRouteOriginLabel }: SidebarProps) {
   return (
     <>
       <button
@@ -234,16 +237,48 @@ export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, show
               </div>
             </div>
           </div>
-          <button
-            className={`sidebar__route-btn ${showRoute ? 'sidebar__route-btn--active' : ''}`}
-            onClick={onToggleRoute}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-              <path d="M3 17l6-6 4 4 8-8" />
-              <polyline points="17 7 21 7 21 11" />
-            </svg>
-            {showRoute ? '경로 숨기기' : '경로 보기'}
-          </button>
+          {/* Golf route info or default route button */}
+          {activeGolfCourse ? (
+            <div className="sidebar__golf-route">
+              <div className="sidebar__golf-route-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                  <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>
+                </svg>
+                <span className="sidebar__golf-route-label">차량 이동 경로</span>
+              </div>
+              <div className="sidebar__golf-route-path">
+                <span className="sidebar__golf-route-from">{golfRouteOriginLabel}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                  <path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+                <span className="sidebar__golf-route-to">{activeGolfCourse}</span>
+              </div>
+              {golfRouteLoading && (
+                <div className="sidebar__golf-route-duration sidebar__golf-route-duration--loading">
+                  경로 계산 중...
+                </div>
+              )}
+              {golfRouteDuration && !golfRouteLoading && (
+                <div className="sidebar__golf-route-duration">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  약 {golfRouteDuration}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className={`sidebar__route-btn ${showRoute ? 'sidebar__route-btn--active' : ''}`}
+              onClick={onToggleRoute}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                <path d="M3 17l6-6 4 4 8-8" />
+                <polyline points="17 7 21 7 21 11" />
+              </svg>
+              {showRoute ? '경로 숨기기' : '경로 보기'}
+            </button>
+          )}
         </div>
         <div className="sidebar__list">
           {schedule.map((item) => (

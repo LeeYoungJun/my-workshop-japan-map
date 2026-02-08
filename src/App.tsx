@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView } from '@react-google-maps/api'
+import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView, DirectionsRenderer } from '@react-google-maps/api'
 import Sidebar from './components/Sidebar'
 import { schedule, routePath, getRouteMarkers } from './data/schedule'
 import './App.css'
@@ -11,7 +11,8 @@ const mapContainerStyle = {
   height: '100vh',
 }
 
-const defaultCenter = { lat: 34.6304, lng: 135.2238 }  // Kobe Airport
+const kobeAirport = { lat: 34.6304, lng: 135.2238 }
+const defaultCenter = kobeAirport
 const defaultZoom = 12
 
 const routeLineOptions: google.maps.PolylineOptions = {
@@ -54,6 +55,10 @@ function App() {
   const [showRoute, setShowRoute] = useState(false)
   const [activeAccomDay, setActiveAccomDay] = useState<number | null>(null)
   const [activeGolfCourse, setActiveGolfCourse] = useState<{ name: string; lat: number; lng: number } | null>(null)
+  const [golfRouteResult, setGolfRouteResult] = useState<google.maps.DirectionsResult | null>(null)
+  const [golfRouteDuration, setGolfRouteDuration] = useState<string | null>(null)
+  const [golfRouteLoading, setGolfRouteLoading] = useState(false)
+  const [golfRouteOriginLabel, setGolfRouteOriginLabel] = useState<string>('')
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const animating = useRef(false)
 
@@ -110,23 +115,52 @@ function App() {
   }, [map, activeAccomDay])
 
   const handleShowGolfCourse = useCallback((lat: number, lng: number, name: string) => {
+    // Toggle off
     if (activeGolfCourse?.name === name) {
       setActiveGolfCourse(null)
+      setGolfRouteResult(null)
+      setGolfRouteDuration(null)
+      setGolfRouteOriginLabel('')
       return
     }
 
     setActiveGolfCourse({ name, lat, lng })
+    setGolfRouteResult(null)
+    setGolfRouteDuration(null)
+    setGolfRouteLoading(true)
 
-    if (map && !animating.current) {
-      animating.current = true
-      map.panTo({ lat, lng })
-      setTimeout(() => {
-        smoothZoom(map, 14, () => {
-          animating.current = false
-        })
-      }, 300)
-    }
-  }, [map, activeGolfCourse])
+    // Day 1 → origin is Kobe Airport, otherwise hotel
+    const isDay1 = selectedDay === 1
+    const origin = isDay1
+      ? kobeAirport
+      : { lat: 34.6873, lng: 135.1930 } // 고베 오리엔탈 호텔
+    setGolfRouteOriginLabel(isDay1 ? '고베 공항' : '오리엔탈 호텔')
+
+    const directionsService = new google.maps.DirectionsService()
+    directionsService.route(
+      {
+        origin,
+        destination: { lat, lng },
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        setGolfRouteLoading(false)
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          setGolfRouteResult(result)
+          const duration = result.routes[0]?.legs[0]?.duration?.text
+          setGolfRouteDuration(duration ?? null)
+          if (map) {
+            const bounds = new google.maps.LatLngBounds()
+            result.routes[0]?.legs[0]?.steps.forEach(step => {
+              bounds.extend(step.start_location)
+              bounds.extend(step.end_location)
+            })
+            map.fitBounds(bounds, { top: 60, bottom: 60, left: 400, right: 60 })
+          }
+        }
+      }
+    )
+  }, [map, activeGolfCourse, selectedDay])
 
   const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
     mapInstance.setOptions({
@@ -177,6 +211,9 @@ function App() {
           onShowAccom={handleShowAccom}
           activeGolfCourse={activeGolfCourse?.name ?? null}
           onShowGolfCourse={handleShowGolfCourse}
+          golfRouteDuration={golfRouteDuration}
+          golfRouteLoading={golfRouteLoading}
+          golfRouteOriginLabel={golfRouteOriginLabel}
         />
         <div className="map-container">
           <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
@@ -227,8 +264,51 @@ function App() {
                 </>
               )}
 
-              {/* Golf course marker */}
-              {activeGolfCourse && (
+              {/* Golf course driving route */}
+              {golfRouteResult && (
+                <>
+                  <DirectionsRenderer
+                    directions={golfRouteResult}
+                    options={{
+                      suppressMarkers: true,
+                      polylineOptions: {
+                        strokeColor: '#16a34a',
+                        strokeOpacity: 0.85,
+                        strokeWeight: 5,
+                      },
+                    }}
+                  />
+                  {(() => {
+                    const leg = golfRouteResult.routes[0]?.legs[0]
+                    if (!leg) return null
+                    return (
+                      <>
+                        <OverlayViewF
+                          position={leg.start_location}
+                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        >
+                          <div className="dir-marker dir-marker--origin">
+                            <div className="dir-marker__pin" />
+                            <span className="dir-marker__label">{golfRouteOriginLabel}</span>
+                          </div>
+                        </OverlayViewF>
+                        <OverlayViewF
+                          position={leg.end_location}
+                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        >
+                          <div className="dir-marker dir-marker--golf">
+                            <div className="dir-marker__pin" />
+                            <span className="dir-marker__label">{activeGolfCourse?.name}</span>
+                          </div>
+                        </OverlayViewF>
+                      </>
+                    )
+                  })()}
+                </>
+              )}
+
+              {/* Golf course marker (no route) */}
+              {activeGolfCourse && !golfRouteResult && (
                 <OverlayViewF
                   position={{ lat: activeGolfCourse.lat, lng: activeGolfCourse.lng }}
                   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}

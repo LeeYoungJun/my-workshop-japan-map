@@ -224,6 +224,95 @@
   flex-shrink: 0;
 }
 
+/* Golf route info card */
+.sidebar__golf-route {
+  margin: 0 20px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  animation: golfRouteSlideIn 0.25s ease-out;
+}
+
+.sidebar__golf-route-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #16a34a;
+  margin-bottom: 8px;
+}
+
+.sidebar__golf-route-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #16a34a;
+}
+
+.sidebar__golf-route-path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.sidebar__golf-route-path svg {
+  flex-shrink: 0;
+  color: #86efac;
+}
+
+.sidebar__golf-route-from {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #166534;
+  white-space: nowrap;
+}
+
+.sidebar__golf-route-to {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #15803d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__golf-route-duration {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #16a34a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar__golf-route-duration svg {
+  flex-shrink: 0;
+  color: #22c55e;
+}
+
+.sidebar__golf-route-duration--loading {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+@keyframes golfRouteSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Scrollable list */
 .sidebar__list {
   flex: 1;

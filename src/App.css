@@ -220,6 +220,14 @@
   background: #ef4444;
 }
 
+.dir-marker--golf .dir-marker__pin {
+  background: #16a34a;
+}
+
+.dir-marker--golf .dir-marker__label {
+  background: #16a34a;
+}
+
 /* ===== Route Markers ===== */
 .route-marker {
   display: flex;
