@@ -5,15 +5,11 @@ import './Sidebar.css'
 
 interface SidebarProps {
   selectedDay: number | null
-  onSelectDay: (day: number | null) => void
   collapsed: boolean
   onToggleCollapse: () => void
   showRoute: boolean
   onToggleRoute: () => void
-  activeAccomDay: number | null
   onShowAccom: (day: number) => void
-  dayRouteDay: number | null
-  onShowDayRoute: (day: number) => void
   activeGolfCourse: string | null
   onShowGolfCourse: (lat: number, lng: number, name: string) => void
 }
@@ -68,17 +64,16 @@ function getPlatformStyle(platform: string | null): { bg: string; color: string 
 }
 
 /* ── Day Card ── */
-function DayCard({ item, isSelected, onClick, isDayRouteActive, onShowDayRoute, activeGolfCourse, onShowGolfCourse }: {
+function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse }: {
   item: DaySchedule
   isSelected: boolean
   onClick: () => void
-  isDayRouteActive: boolean
-  onShowDayRoute: (day: number) => void
   activeGolfCourse: string | null
   onShowGolfCourse: (lat: number, lng: number, name: string) => void
 }) {
   const isWeekend = item.weekday === '토' || item.weekday === '일'
-  const isMovingDay = item.departure !== item.city
+  const isFlightDay = item.transport.includes('비행기')
+  const accomName = item.accommodation?.name ?? item.city
   const ref = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
 
@@ -93,7 +88,7 @@ function DayCard({ item, isSelected, onClick, isDayRouteActive, onShowDayRoute, 
   return (
     <div
       ref={ref}
-      className={`day-card ${isSelected ? 'day-card--selected' : ''} ${isMovingDay ? 'day-card--moving' : ''}`}
+      className={`day-card ${isSelected ? 'day-card--selected' : ''}`}
       onClick={onClick}
     >
       {/* Header: Day + Date */}
@@ -111,29 +106,15 @@ function DayCard({ item, isSelected, onClick, isDayRouteActive, onShowDayRoute, 
         )}
       </div>
 
-      {/* Route: departure → city */}
+      {/* Route / Location */}
       <div className="day-card__route">
         <div className="day-card__route-top">
           <div className="day-card__route-transport">
             {getTransportIcon(item.transport)}
             <span>{item.transport}</span>
           </div>
-          {isMovingDay && (
-            <button
-              className={`day-card__route-btn ${isDayRouteActive ? 'day-card__route-btn--active' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation()
-                onShowDayRoute(item.day)
-              }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
-                <path d="M3 17l6-6 4 4 8-8" /><polyline points="17 7 21 7 21 11" />
-              </svg>
-              경로 보기
-            </button>
-          )}
         </div>
-        {isMovingDay ? (
+        {isFlightDay ? (
           <div className="day-card__route-cities">
             <span className="day-card__route-from">{item.departure}</span>
             <svg className="day-card__route-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
@@ -144,8 +125,8 @@ function DayCard({ item, isSelected, onClick, isDayRouteActive, onShowDayRoute, 
           </div>
         ) : (
           <div className="day-card__route-cities">
-            <span className="day-card__route-to">{item.city}</span>
-            <span className="day-card__route-country">{item.country}</span>
+            <span className="day-card__route-to">{accomName}</span>
+            <span className="day-card__route-country">{item.city}, {item.country}</span>
           </div>
         )}
       </div>
@@ -206,7 +187,7 @@ function DayCard({ item, isSelected, onClick, isDayRouteActive, onShowDayRoute, 
 }
 
 /* ── Sidebar ── */
-export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, dayRouteDay, onShowDayRoute, activeGolfCourse, onShowGolfCourse }: SidebarProps) {
+export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, activeGolfCourse, onShowGolfCourse }: SidebarProps) {
   return (
     <>
       <button
@@ -270,9 +251,7 @@ export default function Sidebar({ selectedDay, onSelectDay, collapsed, onToggleC
               key={item.day}
               item={item}
               isSelected={selectedDay === item.day}
-              onClick={() => onSelectDay(selectedDay === item.day ? null : item.day)}
-              isDayRouteActive={dayRouteDay === item.day}
-              onShowDayRoute={onShowDayRoute}
+              onClick={() => onShowAccom(item.day)}
               activeGolfCourse={activeGolfCourse}
               onShowGolfCourse={onShowGolfCourse}
             />

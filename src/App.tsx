@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView, DirectionsRenderer } from '@react-google-maps/api'
+import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView } from '@react-google-maps/api'
 import Sidebar from './components/Sidebar'
-import { schedule, routePath, getRouteMarkers, cityCoords } from './data/schedule'
+import { schedule, routePath, getRouteMarkers } from './data/schedule'
 import './App.css'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
@@ -53,8 +53,6 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showRoute, setShowRoute] = useState(false)
   const [activeAccomDay, setActiveAccomDay] = useState<number | null>(null)
-  const [dayRouteDay, setDayRouteDay] = useState<number | null>(null)
-  const [dayRouteResult, setDayRouteResult] = useState<google.maps.DirectionsResult | null>(null)
   const [activeGolfCourse, setActiveGolfCourse] = useState<{ name: string; lat: number; lng: number } | null>(null)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const animating = useRef(false)
@@ -72,36 +70,6 @@ function App() {
     setTimeout(() => setShowSplash(false), 600)
   }
 
-  const handleSelectDay = useCallback((day: number | null) => {
-    setSelectedDay(day)
-    if (!map || animating.current) return
-
-    if (day === null) {
-      animating.current = true
-      smoothZoom(map, defaultZoom, () => {
-        map.panTo(defaultCenter)
-        animating.current = false
-      })
-      return
-    }
-
-    const item = schedule.find((s) => s.day === day)
-    if (!item) return
-
-    animating.current = true
-    const currentZoom = map.getZoom() ?? defaultZoom
-    const midZoom = Math.min(currentZoom, item.zoom, 8)
-
-    smoothZoom(map, midZoom, () => {
-      map.panTo({ lat: item.lat, lng: item.lng })
-      setTimeout(() => {
-        smoothZoom(map, item.zoom, () => {
-          animating.current = false
-        })
-      }, 400)
-    })
-  }, [map])
-
   const handleToggleRoute = useCallback(() => {
     setShowRoute(prev => {
       const next = !prev
@@ -118,6 +86,7 @@ function App() {
     // Toggle off if same day
     if (activeAccomDay === day) {
       setActiveAccomDay(null)
+      setSelectedDay(null)
       return
     }
 
@@ -125,6 +94,7 @@ function App() {
     if (!item?.accommodation?.lat || !item?.accommodation?.lng) return
 
     setActiveAccomDay(day)
+    setSelectedDay(day)
 
     if (map && !animating.current) {
       const accomLat = item.accommodation.lat
@@ -138,80 +108,6 @@ function App() {
       }, 300)
     }
   }, [map, activeAccomDay])
-
-  const handleShowDayRoute = useCallback((day: number) => {
-    // Toggle off if same day
-    if (dayRouteDay === day) {
-      setDayRouteDay(null)
-      setDayRouteResult(null)
-      return
-    }
-
-    const item = schedule.find(s => s.day === day)
-    if (!item || item.departure === item.city) return
-
-    const originCoords = cityCoords[item.departure]
-    const destCoords = cityCoords[item.city]
-    if (!originCoords || !destCoords) return
-
-    // Determine travel mode: rental car → DRIVING, else TRANSIT
-    const t = item.transport.toLowerCase()
-    const travelMode = t.includes('렌터카')
-      ? google.maps.TravelMode.DRIVING
-      : google.maps.TravelMode.TRANSIT
-
-    setDayRouteDay(day)
-    setDayRouteResult(null)
-
-    const waypoints: google.maps.DirectionsWaypoint[] = []
-
-    const directionsService = new google.maps.DirectionsService()
-    directionsService.route(
-      {
-        origin: { lat: originCoords.lat, lng: originCoords.lng },
-        destination: { lat: destCoords.lat, lng: destCoords.lng },
-        waypoints,
-        travelMode,
-      },
-      (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result) {
-          setDayRouteResult(result)
-          if (map) {
-            const bounds = new google.maps.LatLngBounds()
-            result.routes[0]?.legs[0]?.steps.forEach(step => {
-              bounds.extend(step.start_location)
-              bounds.extend(step.end_location)
-            })
-            map.fitBounds(bounds, { top: 60, bottom: 60, left: 400, right: 60 })
-          }
-        } else {
-          // Fallback: if TRANSIT fails, try DRIVING
-          if (travelMode === google.maps.TravelMode.TRANSIT) {
-            directionsService.route(
-              {
-                origin: { lat: originCoords.lat, lng: originCoords.lng },
-                destination: { lat: destCoords.lat, lng: destCoords.lng },
-                travelMode: google.maps.TravelMode.DRIVING,
-              },
-              (fallbackResult, fallbackStatus) => {
-                if (fallbackStatus === google.maps.DirectionsStatus.OK && fallbackResult) {
-                  setDayRouteResult(fallbackResult)
-                  if (map) {
-                    const bounds = new google.maps.LatLngBounds()
-                    fallbackResult.routes[0]?.legs[0]?.steps.forEach(step => {
-                      bounds.extend(step.start_location)
-                      bounds.extend(step.end_location)
-                    })
-                    map.fitBounds(bounds, { top: 60, bottom: 60, left: 400, right: 60 })
-                  }
-                }
-              }
-            )
-          }
-        }
-      }
-    )
-  }, [map, dayRouteDay])
 
   const handleShowGolfCourse = useCallback((lat: number, lng: number, name: string) => {
     if (activeGolfCourse?.name === name) {
@@ -274,15 +170,11 @@ function App() {
       <div className="app-layout">
         <Sidebar
           selectedDay={selectedDay}
-          onSelectDay={handleSelectDay}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           showRoute={showRoute}
           onToggleRoute={handleToggleRoute}
-          activeAccomDay={activeAccomDay}
           onShowAccom={handleShowAccom}
-          dayRouteDay={dayRouteDay}
-          onShowDayRoute={handleShowDayRoute}
           activeGolfCourse={activeGolfCourse?.name ?? null}
           onShowGolfCourse={handleShowGolfCourse}
         />
@@ -332,50 +224,6 @@ function App() {
                       </div>
                     </OverlayViewF>
                   ))}
-                </>
-              )}
-
-              {/* Per-day directions route */}
-              {dayRouteResult && (
-                <>
-                  <DirectionsRenderer
-                    directions={dayRouteResult}
-                    options={{
-                      suppressMarkers: true,
-                      polylineOptions: {
-                        strokeColor: '#f59e0b',
-                        strokeOpacity: 0.9,
-                        strokeWeight: 4,
-                      },
-                    }}
-                  />
-                  {(() => {
-                    const leg = dayRouteResult.routes[0]?.legs[0]
-                    if (!leg) return null
-                    const item = schedule.find(s => s.day === dayRouteDay)
-                    return (
-                      <>
-                        <OverlayViewF
-                          position={leg.start_location}
-                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                        >
-                          <div className="dir-marker dir-marker--origin">
-                            <div className="dir-marker__pin" />
-                            <span className="dir-marker__label">{item?.departure}</span>
-                          </div>
-                        </OverlayViewF>
-                        <OverlayViewF
-                          position={leg.end_location}
-                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                        >
-                          <div className="dir-marker dir-marker--dest">
-                            <div className="dir-marker__pin" />
-                            <span className="dir-marker__label">{item?.city}</span>
-                          </div>
-                        </OverlayViewF>
-                      </>
-                    )
-                  })()}
                 </>
               )}
 
