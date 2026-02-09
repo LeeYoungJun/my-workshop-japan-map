@@ -105,6 +105,83 @@ export const golfCourseDetails: Record<string, GolfCourseDetail> = {
   },
 }
 
+// Food & Shopping spot data per day
+export interface FoodShoppingSpot {
+  name: string
+  type: 'food' | 'shopping'
+  description: string
+  lat: number
+  lng: number
+}
+
+export interface DayFoodShopping {
+  day: number
+  dinner: { time: string; area: string; recommendation: string }
+  spots: FoodShoppingSpot[]
+  tip: string
+}
+
+export const foodShoppingData: DayFoodShopping[] = [
+  {
+    day: 1,
+    dinner: {
+      time: '19:00~',
+      area: '고베 하버랜드 (umie/Mosaic)',
+      recommendation: "'비프테키 카와무라' (고베규의 정석) 또는 Mosaic 내 이자카야",
+    },
+    spots: [
+      { name: '비프테키 카와무라', type: 'food', description: '고베규 스테이크 전문점', lat: 34.6815, lng: 135.1858 },
+      { name: 'Mosaic 하버랜드', type: 'food', description: 'umie/Mosaic 내 이자카야', lat: 34.6792, lng: 135.1875 },
+      { name: '빅카메라 하버랜드', type: 'shopping', description: '가전/위스키 쇼핑', lat: 34.6803, lng: 135.1862 },
+      { name: '유니클로 하버랜드', type: 'shopping', description: '의류 쇼핑', lat: 34.6798, lng: 135.1870 },
+    ],
+    tip: '첫날은 피로도가 높으므로 숙소 도보권 내에서 인프라 확인 수준으로 움직입니다.',
+  },
+  {
+    day: 2,
+    dinner: {
+      time: '18:00~',
+      area: '산노미야 & 모토마치',
+      recommendation: "'모토마치 고기 전문점' 혹은 '야키토리 전문점'. 노미호다이(무제한 음료)가 있는 곳 추천",
+    },
+    spots: [
+      { name: '산노미야 맛집거리', type: 'food', description: '고베 메인 번화가 음식점', lat: 34.6932, lng: 135.1955 },
+      { name: '모토마치 고기 전문점', type: 'food', description: '야키니쿠/스테이크 전문', lat: 34.6905, lng: 135.1890 },
+      { name: '돈키호테 산노미야점', type: 'shopping', description: '대형 잡화/면세점', lat: 34.6943, lng: 135.1960 },
+      { name: '다이마루 백화점', type: 'shopping', description: '명품/손수건 선물', lat: 34.6920, lng: 135.1945 },
+    ],
+    tip: '산노미야는 고베의 메인입니다. 가장 번화하고 모든 것이 밀집되어 있습니다.',
+  },
+  {
+    day: 3,
+    dinner: {
+      time: '17:00~',
+      area: '아리마 온천 마을 → 고베 복귀',
+      recommendation: "'난킨마치(차이나타운)' 스트리트 푸드와 맥주, 혹은 산노미야 스시 맛집",
+    },
+    spots: [
+      { name: '난킨마치 차이나타운', type: 'food', description: '스트리트 푸드 & 맥주', lat: 34.6880, lng: 135.1883 },
+      { name: '산노미야 스시 맛집', type: 'food', description: '신선한 스시', lat: 34.6938, lng: 135.1948 },
+      { name: '아리마 특산품점', type: 'shopping', description: '탄산 센베이 등 특산품', lat: 34.7977, lng: 135.2477 },
+      { name: '센터가이 상점가', type: 'shopping', description: '산노미야 쇼핑 아케이드', lat: 34.6935, lng: 135.1938 },
+    ],
+    tip: '아리마 CC와 온천은 지리적으로 가까워, 라운딩 후 온천욕 후 복귀가 효율적입니다.',
+  },
+  {
+    day: 4,
+    dinner: {
+      time: '15:00~',
+      area: '공항 이동 전 마지막 쇼핑',
+      recommendation: "'미쓰이 아울렛 파크 마린 피아' 또는 공항 내 면세점",
+    },
+    spots: [
+      { name: '미쓰이 아울렛 마린피아', type: 'shopping', description: '아울렛 쇼핑', lat: 34.6340, lng: 135.0620 },
+      { name: '고베 공항 면세점', type: 'shopping', description: '출국 전 면세 쇼핑', lat: 34.6320, lng: 135.2240 },
+    ],
+    tip: "공항 출발(18:40) 전 버퍼 타임을 넉넉히 두어 교통 체증에 대비합니다.",
+  },
+]
+
 // Unsplash city photos
 const cityImages: Record<string, string> = {
   '인천': 'https://images.unsplash.com/photo-1583400225507-859fc2b89e5e?w=800&q=80',

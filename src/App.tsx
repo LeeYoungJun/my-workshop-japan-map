@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView, DirectionsRenderer } from '@react-google-maps/api'
 import Sidebar from './components/Sidebar'
 import { schedule, routePath, getRouteMarkers, golfCourseDetails } from './data/schedule'
+import type { FoodShoppingSpot } from './data/schedule'
 import './App.css'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
@@ -60,6 +61,7 @@ function App() {
   const [golfRouteLoading, setGolfRouteLoading] = useState(false)
   const [golfRouteOriginLabel, setGolfRouteOriginLabel] = useState<string>('')
   const [golfPopup, setGolfPopup] = useState<{ name: string; lat: number; lng: number } | null>(null)
+  const [activeFoodSpot, setActiveFoodSpot] = useState<FoodShoppingSpot | null>(null)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const animating = useRef(false)
 
@@ -165,6 +167,23 @@ function App() {
     )
   }, [map, activeGolfCourse, selectedDay])
 
+  const handleShowFoodSpot = useCallback((spot: FoodShoppingSpot) => {
+    if (activeFoodSpot?.name === spot.name) {
+      setActiveFoodSpot(null)
+      return
+    }
+    setActiveFoodSpot(spot)
+    if (map && !animating.current) {
+      animating.current = true
+      map.panTo({ lat: spot.lat, lng: spot.lng })
+      setTimeout(() => {
+        smoothZoom(map, 16, () => {
+          animating.current = false
+        })
+      }, 300)
+    }
+  }, [map, activeFoodSpot])
+
   const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
     mapInstance.setOptions({
       mapTypeControlOptions: {
@@ -217,6 +236,8 @@ function App() {
           golfRouteDuration={golfRouteDuration}
           golfRouteLoading={golfRouteLoading}
           golfRouteOriginLabel={golfRouteOriginLabel}
+          activeFoodSpot={activeFoodSpot?.name ?? null}
+          onShowFoodSpot={handleShowFoodSpot}
         />
         <div className="map-container">
           <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
@@ -344,6 +365,29 @@ function App() {
                   </div>
                 </OverlayViewF>
               )}
+              {/* Food/Shopping spot marker */}
+              {activeFoodSpot && (
+                <OverlayViewF
+                  position={{ lat: activeFoodSpot.lat, lng: activeFoodSpot.lng }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div className={`poi-marker poi-marker--${activeFoodSpot.type === 'food' ? 'restaurant' : 'shop'}`}>
+                    <div className="poi-marker__icon">
+                      {activeFoodSpot.type === 'food' ? (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                          <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="poi-marker__label">{activeFoodSpot.name}</span>
+                  </div>
+                </OverlayViewF>
+              )}
+
               {/* Golf course info popup */}
               {golfPopup && (() => {
                 const detail = golfCourseDetails[golfPopup.name]

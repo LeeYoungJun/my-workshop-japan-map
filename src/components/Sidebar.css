@@ -831,6 +831,231 @@
   color: #15803d;
 }
 
+/* ── Food & Shopping section ── */
+.day-card__food {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-card__food:hover {
+  background: #ffedd5;
+  border-color: #fdba74;
+}
+
+.day-card__food--expanded {
+  background: #ffedd5;
+  border-color: #fb923c;
+  cursor: default;
+}
+
+.day-card__food-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.day-card__food-header svg:first-child {
+  flex-shrink: 0;
+  color: #ea580c;
+}
+
+.day-card__food-title {
+  flex: 1;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #c2410c;
+  white-space: nowrap;
+}
+
+.day-card__food-chevron {
+  flex-shrink: 0;
+  color: #fb923c;
+  transition: transform 0.2s ease;
+}
+
+.day-card__food-chevron--open {
+  transform: rotate(180deg);
+}
+
+.day-card__food-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 0 2px 0;
+  animation: accomSlideDown 0.15s ease-out;
+}
+
+.day-card__food-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-card__food-time {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #ea580c;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.day-card__food-area {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #9a3412;
+}
+
+.day-card__food-rec {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #78350f;
+  line-height: 1.5;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+}
+
+.day-card__food-spots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-card__food-spots-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-card__food-group-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #9a3412;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 4px;
+}
+
+.day-card__food-group-label svg {
+  color: #ea580c;
+}
+
+.day-card__food-spot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.day-card__food-spot svg {
+  flex-shrink: 0;
+  color: #ea580c;
+}
+
+.day-card__food-spot--shop svg {
+  color: #7c3aed;
+}
+
+.day-card__food-spot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.day-card__food-spot-name {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #9a3412;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.day-card__food-spot--shop .day-card__food-spot-name {
+  color: #5b21b6;
+}
+
+.day-card__food-spot-desc {
+  font-size: 0.65rem;
+  color: #a8a29e;
+}
+
+.day-card__food-spot:hover {
+  background: #fed7aa;
+}
+
+.day-card__food-spot--shop:hover {
+  background: #ede9fe;
+}
+
+.day-card__food-spot--active {
+  background: #fdba74;
+  box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.3);
+}
+
+.day-card__food-spot--active .day-card__food-spot-name {
+  font-weight: 700;
+  color: #7c2d12;
+}
+
+.day-card__food-spot--shop.day-card__food-spot--active {
+  background: #ddd6fe;
+  box-shadow: 0 0 0 1.5px rgba(124, 58, 237, 0.3);
+}
+
+.day-card__food-spot--shop.day-card__food-spot--active .day-card__food-spot-name {
+  color: #4c1d95;
+}
+
+.day-card__food-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  border: 1px dashed #fdba74;
+}
+
+.day-card__food-tip svg {
+  flex-shrink: 0;
+  color: #fb923c;
+  margin-top: 1px;
+}
+
+.day-card__food-tip span {
+  font-size: 0.68rem;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+/* ── Selected state overrides for food ── */
+.day-card--selected .day-card__food {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.day-card--selected .day-card__food:hover {
+  background: #ffedd5;
+}
+
 /* ── Selected state overrides for golf ── */
 .day-card--selected .day-card__golf {
   background: #ecfdf5;
@@ -983,6 +1208,16 @@
   .day-card__golf-header {
     min-height: 36px;
     padding: 4px 0;
+  }
+
+  .day-card__food-header {
+    min-height: 36px;
+    padding: 4px 0;
+  }
+
+  .day-card__food-spot {
+    padding: 8px 10px;
+    min-height: 40px;
   }
 }
 

@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
-import { schedule } from '../data/schedule'
-import type { DaySchedule } from '../data/schedule'
+import { schedule, foodShoppingData } from '../data/schedule'
+import type { DaySchedule, FoodShoppingSpot } from '../data/schedule'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -15,6 +15,8 @@ interface SidebarProps {
   golfRouteDuration: string | null
   golfRouteLoading: boolean
   golfRouteOriginLabel: string
+  activeFoodSpot: string | null
+  onShowFoodSpot: (spot: FoodShoppingSpot) => void
 }
 
 /* ── Transport icon helper ── */
@@ -67,18 +69,22 @@ function getPlatformStyle(platform: string | null): { bg: string; color: string 
 }
 
 /* ── Day Card ── */
-function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse }: {
+function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse, activeFoodSpot, onShowFoodSpot }: {
   item: DaySchedule
   isSelected: boolean
   onClick: () => void
   activeGolfCourse: string | null
   onShowGolfCourse: (lat: number, lng: number, name: string) => void
+  activeFoodSpot: string | null
+  onShowFoodSpot: (spot: FoodShoppingSpot) => void
 }) {
   const isWeekend = item.weekday === '토' || item.weekday === '일'
   const isFlightDay = item.transport.includes('비행기')
   const accomName = item.accommodation?.name ?? item.city
   const ref = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
+  const [foodExpanded, setFoodExpanded] = useState(false)
+  const dayFoodData = foodShoppingData.find(f => f.day === item.day)
 
   useEffect(() => {
     if (isSelected && ref.current) {
@@ -185,12 +191,104 @@ function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse
           )}
         </div>
       )}
+
+      {/* Food & Shopping section */}
+      {dayFoodData && (
+        <div className={`day-card__food ${foodExpanded ? 'day-card__food--expanded' : ''}`}>
+          <div
+            className="day-card__food-header"
+            onClick={(e) => {
+              e.stopPropagation()
+              setFoodExpanded(!foodExpanded)
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="13" height="13">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+            <span className="day-card__food-title">저녁 식당 & 쇼핑</span>
+            <svg className={`day-card__food-chevron ${foodExpanded ? 'day-card__food-chevron--open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          {foodExpanded && (
+            <div className="day-card__food-content">
+              <div className="day-card__food-info">
+                <span className="day-card__food-time">{dayFoodData.dinner.time}</span>
+                <span className="day-card__food-area">{dayFoodData.dinner.area}</span>
+              </div>
+              <p className="day-card__food-rec">{dayFoodData.dinner.recommendation}</p>
+
+              <div className="day-card__food-spots">
+                <div className="day-card__food-spots-group">
+                  <span className="day-card__food-group-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
+                      <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                    </svg>
+                    식당
+                  </span>
+                  {dayFoodData.spots.filter(s => s.type === 'food').map((spot) => (
+                    <div
+                      key={spot.name}
+                      className={`day-card__food-spot ${activeFoodSpot === spot.name ? 'day-card__food-spot--active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onShowFoodSpot(spot)
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      <div className="day-card__food-spot-info">
+                        <span className="day-card__food-spot-name">{spot.name}</span>
+                        <span className="day-card__food-spot-desc">{spot.description}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="day-card__food-spots-group">
+                  <span className="day-card__food-group-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="10" height="10">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                    쇼핑
+                  </span>
+                  {dayFoodData.spots.filter(s => s.type === 'shopping').map((spot) => (
+                    <div
+                      key={spot.name}
+                      className={`day-card__food-spot day-card__food-spot--shop ${activeFoodSpot === spot.name ? 'day-card__food-spot--active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onShowFoodSpot(spot)
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      <div className="day-card__food-spot-info">
+                        <span className="day-card__food-spot-name">{spot.name}</span>
+                        <span className="day-card__food-spot-desc">{spot.description}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="day-card__food-tip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>{dayFoodData.tip}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
 /* ── Sidebar ── */
-export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, activeGolfCourse, onShowGolfCourse, golfRouteDuration, golfRouteLoading, golfRouteOriginLabel }: SidebarProps) {
+export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, activeGolfCourse, onShowGolfCourse, golfRouteDuration, golfRouteLoading, golfRouteOriginLabel, activeFoodSpot, onShowFoodSpot }: SidebarProps) {
   return (
     <>
       <button
@@ -292,6 +390,8 @@ export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, show
               onClick={() => onShowAccom(item.day)}
               activeGolfCourse={activeGolfCourse}
               onShowGolfCourse={onShowGolfCourse}
+              activeFoodSpot={activeFoodSpot}
+              onShowFoodSpot={onShowFoodSpot}
             />
           ))}
         </div>

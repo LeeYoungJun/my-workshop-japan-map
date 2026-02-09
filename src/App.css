@@ -295,6 +295,11 @@
   color: #ffffff;
 }
 
+.poi-marker--shop .poi-marker__icon {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
 .poi-marker--golf .poi-marker__icon {
   background: #16a34a;
   color: #ffffff;
@@ -316,6 +321,11 @@
 
 .poi-marker--restaurant .poi-marker__label {
   background: #ea580c;
+  color: #ffffff;
+}
+
+.poi-marker--shop .poi-marker__label {
+  background: #7c3aed;
   color: #ffffff;
 }
 
