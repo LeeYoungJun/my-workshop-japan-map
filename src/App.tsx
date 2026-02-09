@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, LoadScript, PolylineF, OverlayViewF, OverlayView, DirectionsRenderer } from '@react-google-maps/api'
 import Sidebar from './components/Sidebar'
-import { schedule, routePath, getRouteMarkers } from './data/schedule'
+import { schedule, routePath, getRouteMarkers, golfCourseDetails } from './data/schedule'
 import './App.css'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
@@ -59,6 +59,7 @@ function App() {
   const [golfRouteDuration, setGolfRouteDuration] = useState<string | null>(null)
   const [golfRouteLoading, setGolfRouteLoading] = useState(false)
   const [golfRouteOriginLabel, setGolfRouteOriginLabel] = useState<string>('')
+  const [golfPopup, setGolfPopup] = useState<{ name: string; lat: number; lng: number } | null>(null)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const animating = useRef(false)
 
@@ -121,10 +122,12 @@ function App() {
       setGolfRouteResult(null)
       setGolfRouteDuration(null)
       setGolfRouteOriginLabel('')
+      setGolfPopup(null)
       return
     }
 
     setActiveGolfCourse({ name, lat, lng })
+    setGolfPopup(null)
     setGolfRouteResult(null)
     setGolfRouteDuration(null)
     setGolfRouteLoading(true)
@@ -296,7 +299,7 @@ function App() {
                           position={leg.end_location}
                           mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                         >
-                          <div className="dir-marker dir-marker--golf">
+                          <div className="dir-marker dir-marker--golf" style={{ cursor: 'pointer' }} onClick={() => activeGolfCourse && setGolfPopup(activeGolfCourse)}>
                             <div className="dir-marker__pin" />
                             <span className="dir-marker__label">{activeGolfCourse?.name}</span>
                           </div>
@@ -313,7 +316,7 @@ function App() {
                   position={{ lat: activeGolfCourse.lat, lng: activeGolfCourse.lng }}
                   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                  <div className="poi-marker poi-marker--golf">
+                  <div className="poi-marker poi-marker--golf" onClick={() => setGolfPopup(activeGolfCourse)}>
                     <div className="poi-marker__icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
                         <circle cx="19.5" cy="3.5" r="2.5"/><path d="M5 21V4l14 7-14 7"/>
@@ -341,6 +344,52 @@ function App() {
                   </div>
                 </OverlayViewF>
               )}
+              {/* Golf course info popup */}
+              {golfPopup && (() => {
+                const detail = golfCourseDetails[golfPopup.name]
+                if (!detail) return null
+                return (
+                  <OverlayViewF
+                    position={{ lat: golfPopup.lat, lng: golfPopup.lng }}
+                    mapPaneName={OverlayView.FLOAT_PANE}
+                  >
+                    <div className="poi-popup poi-popup--golf">
+                      <button className="poi-popup__close" onClick={() => setGolfPopup(null)}>×</button>
+                      <p className="poi-popup__name">{golfPopup.name}</p>
+                      <p className="poi-popup__name-en">{detail.nameEn}</p>
+                      <div className="poi-popup__stats">
+                        <span className="poi-popup__stat">{detail.holes}홀</span>
+                        <span className="poi-popup__stat-sep">·</span>
+                        <span className="poi-popup__stat">Par {detail.par}</span>
+                        {detail.yards && (
+                          <>
+                            <span className="poi-popup__stat-sep">·</span>
+                            <span className="poi-popup__stat">{detail.yards.toLocaleString()}야드</span>
+                          </>
+                        )}
+                      </div>
+                      {detail.address && <p className="poi-popup__address">{detail.address}</p>}
+                      {detail.tel && <p className="poi-popup__address">TEL: {detail.tel}</p>}
+                      <p className="poi-popup__desc">{detail.description}</p>
+                      {detail.features && (
+                        <div className="poi-popup__features">
+                          {detail.features.map((f, i) => (
+                            <span key={i} className="poi-popup__feature-tag">{f}</span>
+                          ))}
+                        </div>
+                      )}
+                      {detail.established && (
+                        <p className="poi-popup__established">설립 {detail.established}년</p>
+                      )}
+                      {detail.website && (
+                        <a className="poi-popup__link" href={detail.website} target="_blank" rel="noopener noreferrer">
+                          홈페이지 방문 →
+                        </a>
+                      )}
+                    </div>
+                  </OverlayViewF>
+                )
+              })()}
             </GoogleMap>
           </LoadScript>
         </div>

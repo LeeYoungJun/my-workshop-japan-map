@@ -413,6 +413,79 @@
   color: #475569;
 }
 
+.poi-popup--golf {
+  min-width: 240px;
+  max-width: 300px;
+}
+
+.poi-popup__name-en {
+  margin: 0 0 8px 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.poi-popup__stats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.poi-popup__stat {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #ecfdf5;
+  color: #16a34a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+.poi-popup__stat-sep {
+  color: #cbd5e1;
+  font-size: 0.7rem;
+}
+
+.poi-popup__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.poi-popup__feature-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.poi-popup__established {
+  margin: 0 0 6px 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.poi-popup__link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #16a34a;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.poi-popup__link:hover {
+  color: #15803d;
+  text-decoration: underline;
+}
+
 @keyframes poiPopupIn {
   from { opacity: 0; transform: translate(-50%, calc(-100% - 44px)) scale(0.9); }
   to { opacity: 1; transform: translate(-50%, calc(-100% - 44px)) scale(1); }
