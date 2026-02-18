@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { schedule, foodShoppingData } from '../data/schedule'
 import type { DaySchedule, FoodShoppingSpot } from '../data/schedule'
 import './Sidebar.css'
@@ -289,8 +289,55 @@ function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse
 
 /* ── Sidebar ── */
 export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, showRoute, onToggleRoute, onShowAccom, activeGolfCourse, onShowGolfCourse, golfRouteDuration, golfRouteLoading, golfRouteOriginLabel, activeFoodSpot, onShowFoodSpot }: SidebarProps) {
+  const [dragOffset, setDragOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const touchStartY = useRef(0)
+  const touchStartTime = useRef(0)
+  const sidebarRef = useRef<HTMLElement>(null)
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isMobile) return
+    touchStartY.current = e.touches[0].clientY
+    touchStartTime.current = Date.now()
+    setIsDragging(true)
+  }, [isMobile])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !isDragging) return
+    const deltaY = e.touches[0].clientY - touchStartY.current
+    // Only allow dragging down (positive delta)
+    setDragOffset(Math.max(0, deltaY))
+  }, [isMobile, isDragging])
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isMobile || !isDragging) return
+    const elapsed = Date.now() - touchStartTime.current
+    const velocity = dragOffset / elapsed // px/ms
+
+    // Dismiss if dragged more than 100px or fast swipe (velocity > 0.5)
+    if (dragOffset > 100 || velocity > 0.5) {
+      onToggleCollapse()
+    }
+    setDragOffset(0)
+    setIsDragging(false)
+  }, [isMobile, isDragging, dragOffset, onToggleCollapse])
+
+  const sidebarStyle = isDragging && dragOffset > 0
+    ? { transform: `translateY(${dragOffset}px)`, transition: 'none' }
+    : undefined
+
   return (
     <>
+      {/* Mobile backdrop overlay */}
+      {!collapsed && (
+        <div
+          className="sidebar-backdrop"
+          onClick={onToggleCollapse}
+        />
+      )}
+
       <button
         className={`sidebar-toggle ${collapsed ? 'sidebar-toggle--collapsed' : ''}`}
         onClick={onToggleCollapse}
@@ -307,8 +354,20 @@ export default function Sidebar({ selectedDay, collapsed, onToggleCollapse, show
         )}
       </button>
 
-      <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
-        <div className="sidebar__header">
+      <aside
+        ref={sidebarRef}
+        className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}
+        style={sidebarStyle}
+      >
+        <div
+          className="sidebar__header"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="sidebar__drag-handle">
+            <div className="sidebar__drag-handle-bar" />
+          </div>
           <div className="sidebar__header-banner">
             <div className="sidebar__header-banner-bg" />
             <div className="sidebar__header-banner-content">

@@ -84,11 +84,16 @@ function App() {
       if (next && map) {
         const bounds = new google.maps.LatLngBounds()
         routePath.forEach(p => bounds.extend(p))
-        map.fitBounds(bounds, { top: 60, bottom: 60, left: 400, right: 60 })
+        const padding = isMobile()
+          ? { top: 60, bottom: 60, left: 30, right: 30 }
+          : { top: 60, bottom: 60, left: 400, right: 60 }
+        map.fitBounds(bounds, padding)
       }
       return next
     })
   }, [map])
+
+  const isMobile = () => window.innerWidth <= 640
 
   const handleShowAccom = useCallback((day: number) => {
     // Toggle off if same day
@@ -103,6 +108,11 @@ function App() {
 
     setActiveAccomDay(day)
     setSelectedDay(day)
+
+    // Auto-collapse sidebar on mobile so user can see the map
+    if (isMobile()) {
+      setSidebarCollapsed(true)
+    }
 
     if (map && !animating.current) {
       const accomLat = item.accommodation.lat
@@ -134,6 +144,10 @@ function App() {
     setGolfRouteDuration(null)
     setGolfRouteLoading(true)
 
+    if (isMobile()) {
+      setSidebarCollapsed(true)
+    }
+
     // Day 1 → origin is Kobe Airport, otherwise hotel
     const isDay1 = selectedDay === 1
     const origin = isDay1
@@ -160,7 +174,10 @@ function App() {
               bounds.extend(step.start_location)
               bounds.extend(step.end_location)
             })
-            map.fitBounds(bounds, { top: 60, bottom: 60, left: 400, right: 60 })
+            const padding = isMobile()
+              ? { top: 60, bottom: 60, left: 30, right: 30 }
+              : { top: 60, bottom: 60, left: 400, right: 60 }
+            map.fitBounds(bounds, padding)
           }
         }
       }
@@ -173,6 +190,9 @@ function App() {
       return
     }
     setActiveFoodSpot(spot)
+    if (isMobile()) {
+      setSidebarCollapsed(true)
+    }
     if (map && !animating.current) {
       animating.current = true
       map.panTo({ lat: spot.lat, lng: spot.lng })
