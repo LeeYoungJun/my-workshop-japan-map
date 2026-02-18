@@ -177,7 +177,7 @@ export const foodShoppingData: DayFoodShopping[] = [
     spots: [
       { name: '난킨마치 차이나타운', type: 'food', description: '스트리트 푸드 & 맥주', lat: 34.6880, lng: 135.1883 },
       { name: '산노미야 스시 맛집', type: 'food', description: '신선한 스시', lat: 34.6938, lng: 135.1948 },
-      { name: '아리마 특산품점', type: 'shopping', description: '탄산 센베이 등 특산품', lat: 34.7977, lng: 135.2477 },
+      { name: 'TSUCHIYA KABAN Kobe Store', type: 'shopping', description: '가방', lat: 34.6980, lng: 135.1862},
       { name: '센터가이 상점가', type: 'shopping', description: '산노미야 쇼핑 아케이드', lat: 34.6935, lng: 135.1938 },
     ],
     tip: '아리마 CC와 온천은 지리적으로 가까워, 라운딩 후 온천욕 후 복귀가 효율적입니다.',

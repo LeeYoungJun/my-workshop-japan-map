@@ -62,6 +62,11 @@ function App() {
   const [golfRouteOriginLabel, setGolfRouteOriginLabel] = useState<string>('')
   const [golfPopup, setGolfPopup] = useState<{ name: string; lat: number; lng: number } | null>(null)
   const [activeFoodSpot, setActiveFoodSpot] = useState<FoodShoppingSpot | null>(null)
+  const [walkRouteResult, setWalkRouteResult] = useState<google.maps.DirectionsResult | null>(null)
+  const [walkRouteDuration, setWalkRouteDuration] = useState<string | null>(null)
+  const [walkRouteDistance, setWalkRouteDistance] = useState<string | null>(null)
+  const [walkRouteLoading, setWalkRouteLoading] = useState(false)
+  const [walkRouteSpot, setWalkRouteSpot] = useState<string | null>(null)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const animating = useRef(false)
 
@@ -204,6 +209,54 @@ function App() {
     }
   }, [map, activeFoodSpot])
 
+  const handleShowFoodRoute = useCallback((spot: FoodShoppingSpot) => {
+    // Toggle off if same spot
+    if (walkRouteSpot === spot.name) {
+      setWalkRouteResult(null)
+      setWalkRouteDuration(null)
+      setWalkRouteDistance(null)
+      setWalkRouteSpot(null)
+      return
+    }
+
+    setWalkRouteSpot(spot.name)
+    setActiveFoodSpot(spot)
+    setWalkRouteResult(null)
+    setWalkRouteDuration(null)
+    setWalkRouteDistance(null)
+    setWalkRouteLoading(true)
+
+    const hotelOrigin = { lat: 34.6873, lng: 135.1930 }
+    const directionsService = new google.maps.DirectionsService()
+    directionsService.route(
+      {
+        origin: hotelOrigin,
+        destination: { lat: spot.lat, lng: spot.lng },
+        travelMode: google.maps.TravelMode.WALKING,
+      },
+      (result, status) => {
+        setWalkRouteLoading(false)
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          setWalkRouteResult(result)
+          const leg = result.routes[0]?.legs[0]
+          setWalkRouteDuration(leg?.duration?.text ?? null)
+          setWalkRouteDistance(leg?.distance?.text ?? null)
+          if (map) {
+            const bounds = new google.maps.LatLngBounds()
+            leg?.steps.forEach(step => {
+              bounds.extend(step.start_location)
+              bounds.extend(step.end_location)
+            })
+            const padding = isMobile()
+              ? { top: 60, bottom: 60, left: 30, right: 30 }
+              : { top: 60, bottom: 60, left: 400, right: 60 }
+            map.fitBounds(bounds, padding)
+          }
+        }
+      }
+    )
+  }, [map, walkRouteSpot])
+
   const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
     mapInstance.setOptions({
       mapTypeControlOptions: {
@@ -258,6 +311,11 @@ function App() {
           golfRouteOriginLabel={golfRouteOriginLabel}
           activeFoodSpot={activeFoodSpot?.name ?? null}
           onShowFoodSpot={handleShowFoodSpot}
+          onShowFoodRoute={handleShowFoodRoute}
+          walkRouteSpot={walkRouteSpot}
+          walkRouteDuration={walkRouteDuration}
+          walkRouteDistance={walkRouteDistance}
+          walkRouteLoading={walkRouteLoading}
         />
         <div className="map-container">
           <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
@@ -385,8 +443,8 @@ function App() {
                   </div>
                 </OverlayViewF>
               )}
-              {/* Food/Shopping spot marker */}
-              {activeFoodSpot && (
+              {/* Food/Shopping spot marker (hide when walk route is active) */}
+              {activeFoodSpot && !walkRouteResult && (
                 <OverlayViewF
                   position={{ lat: activeFoodSpot.lat, lng: activeFoodSpot.lng }}
                   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
@@ -406,6 +464,54 @@ function App() {
                     <span className="poi-marker__label">{activeFoodSpot.name}</span>
                   </div>
                 </OverlayViewF>
+              )}
+
+              {/* Walking route to food/shopping spot */}
+              {walkRouteResult && (
+                <>
+                  <DirectionsRenderer
+                    directions={walkRouteResult}
+                    options={{
+                      suppressMarkers: true,
+                      polylineOptions: {
+                        strokeColor: '#ea580c',
+                        strokeOpacity: 0.9,
+                        strokeWeight: 4,
+                        icons: [{
+                          icon: { path: google.maps.SymbolPath.CIRCLE, scale: 3, fillColor: '#ea580c', fillOpacity: 0.6, strokeWeight: 0 },
+                          offset: '0',
+                          repeat: '15px',
+                        }],
+                      },
+                    }}
+                  />
+                  {(() => {
+                    const leg = walkRouteResult.routes[0]?.legs[0]
+                    if (!leg) return null
+                    return (
+                      <>
+                        <OverlayViewF
+                          position={leg.start_location}
+                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        >
+                          <div className="dir-marker dir-marker--hotel">
+                            <div className="dir-marker__pin" />
+                            <span className="dir-marker__label">오리엔탈 호텔</span>
+                          </div>
+                        </OverlayViewF>
+                        <OverlayViewF
+                          position={leg.end_location}
+                          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        >
+                          <div className={`dir-marker dir-marker--${activeFoodSpot?.type === 'food' ? 'food' : 'shop'}`}>
+                            <div className="dir-marker__pin" />
+                            <span className="dir-marker__label">{activeFoodSpot?.name}</span>
+                          </div>
+                        </OverlayViewF>
+                      </>
+                    )
+                  })()}
+                </>
               )}
 
               {/* Golf course info popup */}

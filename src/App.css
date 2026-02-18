@@ -229,6 +229,30 @@
   background: #16a34a;
 }
 
+.dir-marker--hotel .dir-marker__pin {
+  background: #7c3aed;
+}
+
+.dir-marker--hotel .dir-marker__label {
+  background: #7c3aed;
+}
+
+.dir-marker--food .dir-marker__pin {
+  background: #ea580c;
+}
+
+.dir-marker--food .dir-marker__label {
+  background: #ea580c;
+}
+
+.dir-marker--shop .dir-marker__pin {
+  background: #7c3aed;
+}
+
+.dir-marker--shop .dir-marker__label {
+  background: #7c3aed;
+}
+
 /* ===== Route Markers ===== */
 .route-marker {
   display: flex;

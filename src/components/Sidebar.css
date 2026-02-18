@@ -904,77 +904,106 @@
   line-height: 1.4;
 }
 
-/* ── Food & Shopping section ── */
-.day-card__food {
+/* ── Food & Shopping button ── */
+.sidebar__food-btn {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: calc(100% - 40px);
+  margin: 8px auto 0;
+  padding: 10px 16px;
   background: #fff7ed;
+  color: #c2410c;
   border: 1px solid #fed7aa;
-  border-radius: 8px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.day-card__food:hover {
+.sidebar__food-btn:hover {
   background: #ffedd5;
+  color: #ea580c;
   border-color: #fdba74;
 }
 
-.day-card__food--expanded {
-  background: #ffedd5;
-  border-color: #fb923c;
-  cursor: default;
+.sidebar__food-btn--active {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
 }
 
-.day-card__food-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.sidebar__food-btn--active:hover {
+  background: linear-gradient(135deg, #c2410c, #9a3412);
+  color: #ffffff;
 }
 
-.day-card__food-header svg:first-child {
+.sidebar__food-btn svg {
   flex-shrink: 0;
-  color: #ea580c;
 }
 
-.day-card__food-title {
+/* ── Food & Shopping Panel ── */
+.food-panel {
   flex: 1;
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: #c2410c;
-  white-space: nowrap;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  padding: 12px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.day-card__food-chevron {
-  flex-shrink: 0;
-  color: #fb923c;
-  transition: transform 0.2s ease;
+.food-panel::-webkit-scrollbar {
+  width: 5px;
 }
 
-.day-card__food-chevron--open {
-  transform: rotate(180deg);
+.food-panel::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.day-card__food-content {
+.food-panel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+.food-panel__day {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 6px 0 2px 0;
-  animation: accomSlideDown 0.15s ease-out;
+  padding: 14px 16px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
 }
 
-.day-card__food-info {
+.food-panel__day-header {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
-.day-card__food-time {
+.food-panel__day-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #ffffff;
+  background: #ea580c;
+  border-radius: 5px;
+  line-height: 1.5;
+}
+
+.food-panel__day-time {
   display: inline-block;
   padding: 2px 7px;
-  background: #ea580c;
+  background: #9a3412;
   color: #ffffff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -982,13 +1011,13 @@
   white-space: nowrap;
 }
 
-.day-card__food-area {
+.food-panel__day-area {
   font-size: 0.73rem;
   font-weight: 600;
   color: #9a3412;
 }
 
-.day-card__food-rec {
+.food-panel__rec {
   margin: 0;
   font-size: 0.72rem;
   color: #78350f;
@@ -998,19 +1027,19 @@
   border-radius: 6px;
 }
 
-.day-card__food-spots {
+.food-panel__spots {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.day-card__food-spots-group {
+.food-panel__spots-group {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.day-card__food-group-label {
+.food-panel__group-label {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1022,11 +1051,19 @@
   padding: 2px 4px;
 }
 
-.day-card__food-group-label svg {
+.food-panel__group-label svg {
   color: #ea580c;
 }
 
-.day-card__food-spot {
+.food-panel__group-label--shop svg {
+  color: #7c3aed;
+}
+
+.food-panel__group-label--shop {
+  color: #5b21b6;
+}
+
+.food-panel__spot {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1036,23 +1073,23 @@
   transition: all 0.15s ease;
 }
 
-.day-card__food-spot svg {
+.food-panel__spot svg {
   flex-shrink: 0;
   color: #ea580c;
 }
 
-.day-card__food-spot--shop svg {
+.food-panel__spot--shop svg {
   color: #7c3aed;
 }
 
-.day-card__food-spot-info {
+.food-panel__spot-info {
   display: flex;
   flex-direction: column;
   gap: 1px;
   min-width: 0;
 }
 
-.day-card__food-spot-name {
+.food-panel__spot-name {
   font-size: 0.73rem;
   font-weight: 600;
   color: #9a3412;
@@ -1061,43 +1098,183 @@
   text-overflow: ellipsis;
 }
 
-.day-card__food-spot--shop .day-card__food-spot-name {
+.food-panel__spot--shop .food-panel__spot-name {
   color: #5b21b6;
 }
 
-.day-card__food-spot-desc {
+.food-panel__spot-desc {
   font-size: 0.65rem;
   color: #a8a29e;
 }
 
-.day-card__food-spot:hover {
+.food-panel__spot:hover {
   background: #fed7aa;
 }
 
-.day-card__food-spot--shop:hover {
+.food-panel__spot--shop:hover {
   background: #ede9fe;
 }
 
-.day-card__food-spot--active {
+.food-panel__spot--active {
   background: #fdba74;
   box-shadow: 0 0 0 1.5px rgba(234, 88, 12, 0.3);
 }
 
-.day-card__food-spot--active .day-card__food-spot-name {
+.food-panel__spot--active .food-panel__spot-name {
   font-weight: 700;
   color: #7c2d12;
 }
 
-.day-card__food-spot--shop.day-card__food-spot--active {
+.food-panel__spot--shop.food-panel__spot--active {
   background: #ddd6fe;
   box-shadow: 0 0 0 1.5px rgba(124, 58, 237, 0.3);
 }
 
-.day-card__food-spot--shop.day-card__food-spot--active .day-card__food-spot-name {
+.food-panel__spot--shop.food-panel__spot--active .food-panel__spot-name {
   color: #4c1d95;
 }
 
-.day-card__food-tip {
+/* ── Food/Shopping route button ── */
+.food-panel__route-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #ea580c;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #fdba74;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.food-panel__route-btn:hover {
+  background: #fff7ed;
+  border-color: #fb923c;
+}
+
+.food-panel__route-btn--active {
+  background: #ea580c;
+  color: #ffffff;
+  border-color: #ea580c;
+}
+
+.food-panel__route-btn--active:hover {
+  background: #c2410c;
+  border-color: #c2410c;
+  color: #ffffff;
+}
+
+.food-panel__route-btn--shop {
+  color: #7c3aed;
+  border-color: #c4b5fd;
+}
+
+.food-panel__route-btn--shop:hover {
+  background: #f5f3ff;
+  border-color: #a78bfa;
+}
+
+.food-panel__route-btn--shop.food-panel__route-btn--active {
+  background: #7c3aed;
+  color: #ffffff;
+  border-color: #7c3aed;
+}
+
+.food-panel__route-btn--shop.food-panel__route-btn--active:hover {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+
+.food-panel__route-btn svg {
+  flex-shrink: 0;
+}
+
+/* ── Walk route info ── */
+.food-panel__walk-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 2px 8px 6px 25px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  animation: walkInfoSlideIn 0.2s ease-out;
+}
+
+.food-panel__walk-info--shop {
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  border-color: #c4b5fd;
+}
+
+.food-panel__walk-path {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #9a3412;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.food-panel__walk-info--shop .food-panel__walk-path {
+  color: #5b21b6;
+}
+
+.food-panel__walk-stats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #ffffff;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ea580c;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.food-panel__walk-info--shop .food-panel__walk-stats {
+  color: #7c3aed;
+}
+
+.food-panel__walk-stats svg {
+  flex-shrink: 0;
+  color: #fb923c;
+}
+
+.food-panel__walk-info--shop .food-panel__walk-stats svg {
+  color: #a78bfa;
+}
+
+.food-panel__walk-sep {
+  color: #d1d5db;
+  font-weight: 400;
+}
+
+.food-panel__walk-loading {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+@keyframes walkInfoSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.food-panel__tip {
   display: flex;
   align-items: flex-start;
   gap: 5px;
@@ -1107,26 +1284,16 @@
   border: 1px dashed #fdba74;
 }
 
-.day-card__food-tip svg {
+.food-panel__tip svg {
   flex-shrink: 0;
   color: #fb923c;
   margin-top: 1px;
 }
 
-.day-card__food-tip span {
+.food-panel__tip span {
   font-size: 0.68rem;
   color: #78350f;
   line-height: 1.5;
-}
-
-/* ── Selected state overrides for food ── */
-.day-card--selected .day-card__food {
-  background: #fff7ed;
-  border-color: #fdba74;
-}
-
-.day-card--selected .day-card__food:hover {
-  background: #ffedd5;
 }
 
 /* ── Selected state overrides for golf ── */
@@ -1359,14 +1526,29 @@
     padding: 4px 0;
   }
 
-  .day-card__food-header {
+  /* Food button */
+  .sidebar__food-btn {
+    width: calc(100% - 32px);
+    padding: 12px 16px;
+    font-size: 0.8rem;
     min-height: 44px;
-    padding: 4px 0;
   }
 
-  .day-card__food-spot {
+  /* Food panel */
+  .food-panel {
+    padding: 10px 12px 32px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .food-panel__spot {
     padding: 8px 10px;
     min-height: 44px;
+  }
+
+  .food-panel__route-btn {
+    padding: 6px 10px;
+    font-size: 0.65rem;
+    min-height: 36px;
   }
 
   /* Bigger day badge for easier tap */
