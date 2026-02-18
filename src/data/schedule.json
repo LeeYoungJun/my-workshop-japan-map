@@ -12,7 +12,7 @@
       "name": "고베 오리엔탈 호텔",
       "address": "고베시, 일본"
     },
-    "golfCourses": ["도죠 파인 밸리"],
+    "golfCourses": ["도죠 파인 밸리CC"],
     "activities": "대한항공 KE2171 인천 08:25→고베 10:10"
   },
   {
@@ -28,8 +28,8 @@
       "name": "고베 오리엔탈 호텔",
       "address": "고베시, 일본"
     },
-    "golfCourses": ["미키오카와", "아리마컨츄리", "웨스트윈즈"],
-    "activities": "호텔 조식, 미키오카와/아리마컨츄리/웨스트윈즈 18홀 라운드"
+    "golfCourses": ["웨스트윈즈CC"],
+    "activities": "호텔 조식"
   },
   {
     "day": 3,
@@ -44,8 +44,8 @@
       "name": "고베 오리엔탈 호텔",
       "address": "고베시, 일본"
     },
-    "golfCourses": ["미키오카와", "아리마컨츄리", "웨스트윈즈"],
-    "activities": "호텔 조식, 미키오카와/아리마컨츄리/웨스트윈즈 18홀 라운드"
+    "golfCourses": ["아리마컨츄리CC"],
+    "activities": "호텔 조식"
   },
   {
     "day": 4,
@@ -57,7 +57,7 @@
     "transport": "비행기",
     "bookingPlatform": null,
     "accommodation": null,
-    "golfCourses": ["미키오카와", "아리마컨츄리", "웨스트윈즈"],
+    "golfCourses": ["마담제이CC"],
     "activities": "대한항공 KE2174 고베 18:40→인천 20:40"
   }
 ]

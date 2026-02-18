@@ -7,10 +7,16 @@ export interface Accommodation {
   lng?: number
 }
 
+export interface TeeTime {
+  time: string
+  note?: string
+}
+
 export interface GolfCourse {
   name: string
   lat: number
   lng: number
+  teeTimes?: TeeTime[]
 }
 
 export interface ScheduleEntry {
@@ -48,10 +54,19 @@ const accomCoords: Record<string, { lat: number; lng: number }> = {
 
 // Golf course coordinates
 const golfCourseCoords: Record<string, { lat: number; lng: number }> = {
-  '도죠 파인 밸리': { lat: 34.8995, lng: 135.0379 },
-  '미키오카와': { lat: 34.8330, lng: 135.0375 },
-  '아리마컨츄리': { lat: 34.9046, lng: 135.1734 },
-  '웨스트윈즈': { lat: 34.9587, lng: 134.9981 },
+  '도죠 파인 밸리CC': { lat: 34.8995, lng: 135.0379 },
+  '미키오카와CC': { lat: 34.8330, lng: 135.0375 },
+  '아리마컨츄리CC': { lat: 34.9046, lng: 135.1734 },
+  '웨스트윈즈CC': { lat: 34.9587, lng: 134.9981 },
+  '마담제이CC': { lat: 34.9481, lng: 135.0634 },
+}
+
+// Tee time data per day
+const teeTimeData: Record<number, TeeTime[]> = {
+  1: [{ time: '12:30' }],
+  2: [{ time: '09:32' }, { time: '09:40', note: '1인 추가 그린피 현장지불' }],
+  3: [{ time: '09:08' }],
+  4: [{ time: '09:17' }],
 }
 
 // Golf course detail info
@@ -69,7 +84,7 @@ export interface GolfCourseDetail {
 }
 
 export const golfCourseDetails: Record<string, GolfCourseDetail> = {
-  '미키오카와': {
+  '미키오카와 CC': {
     nameEn: 'Mikiyokawa Country Club',
     holes: 27,
     par: 108,
@@ -78,7 +93,7 @@ export const golfCourseDetails: Record<string, GolfCourseDetail> = {
     description: '연못과 계곡이 있어 전략적이고 기술적인 플레이가 요구되며, 각 코스마다 넓은 페어웨이, 다양한 거리 등 다양한 특성을 가지고 있습니다.',
     features: ['동쪽·중·서 3코스 (27홀)', '넓은 페어웨이와 연못', '자연 지형을 살린 레이아웃'],
   },
-  '아리마컨츄리': {
+  '아리마컨츄리 CC': {
     nameEn: 'Arima Country Club',
     holes: 18,
     par: 72,
@@ -89,14 +104,14 @@ export const golfCourseDetails: Record<string, GolfCourseDetail> = {
     features: ['LPGA 공식대회 개최', '천연온천 시설 완비', '캐디 선택 가능', '카트 5인승'],
     established: '1960',
   },
-  '도죠 파인 밸리': {
+  '도죠 파인 밸리 CC': {
     nameEn: 'Tojo Pine Valley Golf Club',
     holes: 18,
     par: 72,
     description: '고도차가 적은 부드러운 구릉지에 느긋하게 배치된 각 홀은 풍부한 수목으로 분리되어 있습니다. 페어웨이는 광대하고, 큰 그린과 함께 개방감 있는 속에서 플레이를 즐길 수 있습니다.',
     features: ['캐디/셀프 선택 가능', '영국풍 클럽하우스', '고베 번화가 45분 거리'],
   },
-  '웨스트윈즈': {
+  '웨스트윈즈 CC': {
     nameEn: "West One's Country Club",
     holes: 18,
     par: 72,
@@ -199,9 +214,11 @@ export const schedule: DaySchedule[] = (rawSchedule as ScheduleEntry[]).map(entr
     accom.lat = accomCoords[accom.name].lat
     accom.lng = accomCoords[accom.name].lng
   }
+  const dayTeeTimes = teeTimeData[entry.day]
   const golfCourseData: GolfCourse[] = (entry.golfCourses ?? []).map(name => ({
     name,
     ...(golfCourseCoords[name] ?? { lat: 0, lng: 0 }),
+    teeTimes: dayTeeTimes,
   }))
   return { ...entry, ...coords, image, golfCourseData }
 })

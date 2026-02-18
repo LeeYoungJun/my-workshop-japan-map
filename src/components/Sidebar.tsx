@@ -164,6 +164,14 @@ function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse
               <circle cx="19.5" cy="3.5" r="2.5"/><path d="M5 21V4l14 7-14 7"/>
             </svg>
             <span className="day-card__golf-title">골프장</span>
+            {!expanded && item.golfCourseData[0]?.teeTimes?.[0] && (
+              <span className="day-card__golf-tee-preview">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="9" height="9">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {item.golfCourseData[0].teeTimes.map(t => t.time).join(' / ')}
+              </span>
+            )}
             <svg className={`day-card__golf-chevron ${expanded ? 'day-card__golf-chevron--open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
@@ -171,20 +179,36 @@ function DayCard({ item, isSelected, onClick, activeGolfCourse, onShowGolfCourse
           {expanded && (
             <div className="day-card__golf-list">
               {item.golfCourseData.map((gc) => (
-                <div
-                  key={gc.name}
-                  className={`day-card__golf-item ${activeGolfCourse === gc.name ? 'day-card__golf-item--active' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (gc.lat && gc.lng) {
-                      onShowGolfCourse(gc.lat, gc.lng, gc.name)
-                    }
-                  }}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-                  </svg>
-                  <span>{gc.name}</span>
+                <div key={gc.name}>
+                  <div
+                    className={`day-card__golf-item ${activeGolfCourse === gc.name ? 'day-card__golf-item--active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (gc.lat && gc.lng) {
+                        onShowGolfCourse(gc.lat, gc.lng, gc.name)
+                      }
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <span>{gc.name}</span>
+                  </div>
+                  {gc.teeTimes && gc.teeTimes.length > 0 && (
+                    <div className="day-card__golf-tee">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="11" height="11">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      <div className="day-card__golf-tee-times">
+                        {gc.teeTimes.map((tt, i) => (
+                          <div key={i} className="day-card__golf-tee-entry">
+                            <span className="day-card__golf-tee-badge">{tt.time}</span>
+                            {tt.note && <span className="day-card__golf-tee-note">{tt.note}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
